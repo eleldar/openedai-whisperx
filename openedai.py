@@ -2,23 +2,20 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import PlainTextResponse
 
+
 class OpenAIStub(FastAPI):
     def __init__(self) -> None:
         super().__init__()
         self.models = {}
-            
+
         self.add_middleware(
-            CORSMiddleware,
-            allow_origins=["*"],
-            allow_credentials=True,
-            allow_methods=["*"],
-            allow_headers=["*"]
+            CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"]
         )
 
-        @self.get('/v1/billing/usage')
-        @self.get('/v1/dashboard/billing/usage')
+        @self.get("/v1/billing/usage")
+        @self.get("/v1/dashboard/billing/usage")
         async def handle_billing_usage():
-            return { 'total_usage': 0 }
+            return {"total_usage": 0}
 
         @self.get("/", response_class=PlainTextResponse)
         @self.head("/", response_class=PlainTextResponse)
@@ -28,7 +25,7 @@ class OpenAIStub(FastAPI):
 
         @self.get("/health")
         async def health():
-            return {"status": "ok" if self.models else "unk" }
+            return {"status": "ok" if self.models else "unk"}
 
         @self.get("/v1/models")
         async def get_model_list():
@@ -46,21 +43,13 @@ class OpenAIStub(FastAPI):
             del self.models[name]
 
     def model_info(self, model: str) -> dict:
-        result = {
-            "id": model,
-            "object": "model",
-            "created": 0,
-            "owned_by": "user"
-        }
+        result = {"id": model, "object": "model", "created": 0, "owned_by": "user"}
         return result
 
     def model_list(self) -> dict:
         if not self.models:
             return {}
-        
-        result = {
-            "object": "list",
-            "data": [ self.model_info(model) for model in list(set(self.models.keys() | self.models.values())) if model ]
-        }
+
+        result = {"object": "list", "data": list(set(self.models.keys()))}
 
         return result

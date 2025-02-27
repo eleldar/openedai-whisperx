@@ -1,0 +1,6 @@
+openai
+pytest
+pytest-asyncio
+requests
+python-dotenv
+Levenshtein

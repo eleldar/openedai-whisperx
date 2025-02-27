@@ -1,19 +1,21 @@
-version: "3.3"
 services:
   server:
+    image: whisperx-server
+    container_name: WhisperXSever
     build:
       context: .
       dockerfile: Dockerfile
     stdin_open: true
     tty: true
-    environment:
-      - HF_HOME=/app/hf_home
     env_file:
       - whisper.env
     ports:
       - "8000:8000"
+    environment:
+      - HF_HOME=/app/hf_home
     volumes:
       - ./hf_home:/app/hf_home
+    restart: always
     runtime: nvidia
     deploy:
       resources:
