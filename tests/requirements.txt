@@ -1,3 +1,5 @@
+torch
+whisperx
 openai
 pytest
 pytest-asyncio
