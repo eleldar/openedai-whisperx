@@ -87,6 +87,7 @@ class TestAPI:
                 response_format="verbose_json",
                 timestamp_granularities="segment",
                 language="ru",
+                temperature=0,
             )
         assert isinstance(transcript, TranscriptionVerbose)
         result = {
