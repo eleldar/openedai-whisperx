@@ -32,7 +32,7 @@ class TestAPI:
             base_url=f"{self._api_url}/v1",
             api_key="api_key",
         )
-        self._distance_coef = 0.05
+        self._distance_coef = 1 / 3
         connection = False
         timeout_counter = 0
         while not connection:
