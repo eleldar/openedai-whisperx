@@ -90,7 +90,6 @@ async def transcriptions(
             "segments": result["segments"],
             "words": result["word_segments"],
             "word_segments": result["word_segments"],
-            "align_result": result,
         }
         return JSONResponse(
             content=content,

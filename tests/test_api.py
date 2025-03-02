@@ -90,12 +90,19 @@ class TestAPI:
                 temperature=0,
             )
         assert isinstance(transcript, TranscriptionVerbose)
-        result = transcript.align_result
+        result = result = {
+            "segments": list(map(dict, transcript.segments)),
+            "word_segments": list(map(dict, transcript.word_segments)),
+        }
         assert isinstance(result["segments"], list)
         for segment in result["segments"]:
             assert isinstance(segment["text"], str)
             assert isinstance(segment["start"], (float, NoneType))
             assert isinstance(segment["end"], (float, NoneType))
+        for segment in result["word_segments"]:
+            assert isinstance(segment["word"], str)
+            assert isinstance(segment.get("start"), (float, NoneType))
+            assert isinstance(segment.get("end"), (float, NoneType))
         with open(self._file_dir / "text.txt") as f:
             true_text = f.read().strip()
             pred_text = str(transcript.model_dump_json())
