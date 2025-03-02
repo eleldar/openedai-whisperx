@@ -9,8 +9,6 @@ services:
     tty: true
     ports:
       - "8000:8000"
-    environment:
-      - HF_HOME=/app/hf_home
     volumes:
       - ./models:/app/models
       - tempfiles:/app/tempfiles
