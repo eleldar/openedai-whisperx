@@ -16,9 +16,6 @@ from fastapi.responses import JSONResponse, PlainTextResponse
 
 import openedai
 
-torch.backends.cuda.matmul.allow_tf32 = True
-torch.backends.cudnn.allow_tf32 = True
-
 logger = logging.getLogger(__name__)
 
 app = openedai.OpenAIStub()
@@ -170,6 +167,9 @@ if __name__ == "__main__":
         device = "cuda" if torch.cuda.is_available() else "cpu"
     if args.dtype == "auto":
         compute_type = "float16" if torch.cuda.is_available() else "int8"
+    if torch.cuda.is_available():
+        torch.backends.cuda.matmul.allow_tf32 = True
+        torch.backends.cudnn.allow_tf32 = True
     uvicorn.run(
         app, host=args.host, port=args.port
     )  # , root_path=cwd, access_log=False, log_level="info", ssl_keyfile="cert.pem", ssl_certfile="cert.pem")
