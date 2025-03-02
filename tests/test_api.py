@@ -25,14 +25,14 @@ class TestAPI:
             stderr=subprocess.STDOUT,
         )
         self._sleep = 1
-        self._timeout = 300
+        self._timeout = 10
         self._api_url = f'http://{os.environ.get("API_HOST")}:{os.environ.get("API_PORT")}'
         self._file_dir = Path("tests/datasets")
         self._model = OpenAI(
             base_url=f"{self._api_url}/v1",
             api_key="api_key",
         )
-        self._distance_coef = 1 / 3
+        self._distance_coef = 0.05
         connection = False
         timeout_counter = 0
         while not connection:
@@ -82,19 +82,15 @@ class TestAPI:
         assert isinstance(self._model, OpenAI)
         with open(file_path, "rb") as file:
             transcript = self._model.audio.transcriptions.create(
-                model="openai/whisper-large-v3",
+                model="openai/whisper-small",
                 file=file,
                 response_format="verbose_json",
-                timestamp_granularities="segment",
+                timestamp_granularities="word",
                 language="ru",
                 temperature=0,
             )
         assert isinstance(transcript, TranscriptionVerbose)
-        result = {
-            "segments": [
-                {"text": segment.text, "start": segment.start, "end": segment.end} for segment in transcript.segments
-            ]
-        }
+        result = transcript.align_result
         assert isinstance(result["segments"], list)
         for segment in result["segments"]:
             assert isinstance(segment["text"], str)
