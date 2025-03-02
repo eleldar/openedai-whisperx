@@ -12,7 +12,7 @@ from Levenshtein import distance
 from openai import OpenAI
 from openai.types.audio.transcription_verbose import TranscriptionVerbose
 
-load_dotenv("whisper.env")
+load_dotenv("whisperx.env")
 
 
 @pytest.mark.asyncio
