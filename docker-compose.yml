@@ -7,8 +7,7 @@ services:
       dockerfile: Dockerfile
     stdin_open: true
     tty: true
-    env_file: 
-      - whisperx.env
+    command: uvicorn main:app --host ${TRANSCRIBATION_API_HOST} --port ${TRANSCRIBATION_API_PORT}
     ports:
       - ${TRANSCRIBATION_API_PORT}:${TRANSCRIBATION_API_PORT}
     volumes:

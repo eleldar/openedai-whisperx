@@ -1,16 +1,11 @@
-OpenedAI Whisper
+OpenedAI WhisperX
 ----------------
 
-Notice: This software is mostly obsolete and will no longer be updated.
-
-Some Alternative(s):
-
-* https://speaches.ai/
-* https://github.com/gpustack/vox-box
+Notice: This software is forked from https://github.com/matatonic/openedai-whisper/blob/main/whisper.py
 
 ----
 
-An OpenAI API compatible speech to text server for audio transcription and translations, aka. Whisper.
+An OpenAI API compatible speech to text server for audio transcription and translations.
 
 - Compatible with the OpenAI audio/transcriptions and audio/translations API
 - Does not connect to the OpenAI API and does not require an OpenAI API Key
@@ -18,34 +13,31 @@ An OpenAI API compatible speech to text server for audio transcription and trans
 
 API Compatibility:
 - [X] /v1/audio/transcriptions
-- [X] /v1/audio/translations
+- [ ] /v1/audio/translations
 
 Parameter Support:
 - [X] `file`
-- [X] `model` (only whisper-1 exists, so this is ignored)
+- [X] `model`
 - [X] `language`
-- [ ] `prompt` (not yet supported)
+- [X] `prompt`
 - [X] `temperature`
-- [X] `response_format`:
-- - [X] `json`
-- - [X] `text`
-- - [X] `srt`
-- - [X] `vtt`
-- - [X] `verbose_json` *(partial support, some fields missing)
+- [ ] `response_format`:
+- - [ ] `json`
+- - [ ] `text`
+- - [ ] `srt`
+- - [ ] `vtt`
+- - [ ] `verbose_json` *(always return verbose json)
 
 Details:
 * CUDA or CPU support (automatically detected)
-* float32, float16 or bfloat16 support (automatically detected)
+* float16 or int8 support (automatically detected)
 
 Tested whisper models:
-* openai/whisper-large-v2 (the default)
-* openai/whisper-large-v3
-* distil-whisper/distil-medium.en
-* openai/whisper-tiny.en
+* openai/whisper-large-v3 (the default)
+* openai/whisper-small
 * ...
 
-
-Version: 0.1.0, Last update: 2024-03-15
+Version: 0.1.0, Last update: 2025-03-03
 
 
 API Documentation
@@ -58,20 +50,29 @@ API Documentation
 * [OpenAI API Translation Reference](https://platform.openai.com/docs/api-reference/audio/createTranslation)
 
 
+Docker support
+--------------
+
+```shell
+docker compose --env-file whisperx.env up --build
+```
+
+
 Installation instructions
 -------------------------
 
 You will need to install CUDA for your operating system if you want to use CUDA.
 
 ```shell
+# install ffmpeg
+sudo apt install ffmpeg libcudnn8 libcudnn8-dev libcudnn8-samples
 # Install the Python requirements
 pip install -r requirements.txt
-# install ffmpeg
-sudo apt install ffmpeg
 ```
 
-Usage
------
+
+CLI Usage
+---------
 
 ```
 Usage: whisper.py [-m <model_name>] [-d <device>] [-t <dtype>] [-P <port>] [-H <host>] [--preload]
@@ -84,15 +85,16 @@ Options:
 -h, --help            Show this help message and exit.
 -m MODEL, --model MODEL
                       The model to use for transcription.
-                      Ex. distil-whisper/distil-medium.en (default: openai/whisper-large-v2)
+                      Ex. openai/whisper-small (default: openai/whisper-large-v3)
 -d DEVICE, --device DEVICE
                       Set the torch device for the model. Ex. cuda:1 (default: auto)
 -t DTYPE, --dtype DTYPE
-                      Set the torch data type for processing (float32, float16, bfloat16) (default: auto)
+                      Set the torch data type for processing (float16, int8) (default: auto)
 -P PORT, --port PORT  Server tcp port (default: 8000)
 -H HOST, --host HOST  Host to listen on, Ex. 0.0.0.0 (default: localhost)
 --preload             Preload model and exit. (default: False)
 ```
+
 
 Sample API Usage
 ----------------
@@ -100,13 +102,13 @@ Sample API Usage
 You can use it like this:
 
 ```shell
-curl -s http://localhost:8000/v1/audio/transcriptions -H "Content-Type: multipart/form-data" -F model="whisper-1" -F file="@audio.mp3" -F response_format=text
+curl -s http://localhost:8000/v1/audio/transcriptions -H "Content-Type: multipart/form-data" -F model="openai/whisper-large-v3" -F file="@audio.mp3" -F response_format=text
 ```
 
 Or just like this:
 
 ```shell
-curl -s http://localhost:8000/v1/audio/transcriptions -F model="whisper-1" -F file="@audio.mp3"
+curl -s http://localhost:8000/v1/audio/transcriptions -F model="openai/whisper-large-v3" -F file="@audio.mp3"
 ```
 
 Or like this example from the [OpenAI Speech to text guide Quickstart](https://platform.openai.com/docs/guides/speech-to-text/quickstart):
@@ -116,17 +118,6 @@ from openai import OpenAI
 client = OpenAI(api_key='sk-1111', base_url='http://localhost:8000/v1')
 
 audio_file = open("/path/to/file/audio.mp3", "rb")
-transcription = client.audio.transcriptions.create(model="whisper-1", file=audio_file)
+transcription = client.audio.transcriptions.create(model="openai/whisper-large-v3", file=audio_file)
 print(transcription.text)
 ```
-
-Docker support
---------------
-
-You can run the server via docker like so:
-```shell
-docker compose build
-docker compose up
-```
-
-Options can be set via `whisper.env`.
