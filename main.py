@@ -8,41 +8,43 @@ import uvicorn
 from config import state
 from processor import app
 
+logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-
-def parse_args(argv=None):
-    parser = argparse.ArgumentParser(
-        prog="whisper.py",
-        description="OpenedAI Whisper API Server",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-    )
-    parser.add_argument(
-        "-m",
-        "--model",
-        action="store",
-        default="openai/whisper-large-v3",
-        help="The model to use for transcription. Ex. distil-whisper/medium",
-    )
-    parser.add_argument(
-        "-d", "--device", action="store", default="auto", help="Set the torch device for the model. Ex. cuda:1"
-    )
-    parser.add_argument(
-        "-t",
-        "--dtype",
-        action="store",
-        default="auto",
-        help="Set the torch data type for processing (float16, int8)",
-    )
-    parser.add_argument("-P", "--port", action="store", default=8000, type=int, help="Server tcp port")
-    parser.add_argument("-H", "--host", action="store", default="localhost", help="Host to listen on, Ex. 0.0.0.0")
-    return parser.parse_args()
+for _name, _model in state.model_mapping.items():
+    app.register_model(name=_name, model=_model)
+    logger.info(f"Registered model: {_name}:{_model}")
 
 
 if __name__ == "__main__":
-    logging.basicConfig(stream=sys.stdout, level=logging.INFO)
-    for _name, _model in state.model_mapping.items():
-        app.register_model(name=_name, model=_model)
+
+    def parse_args(argv=None):
+        parser = argparse.ArgumentParser(
+            prog="whisper.py",
+            description="OpenedAI Whisper API Server",
+            formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        )
+        parser.add_argument(
+            "-m",
+            "--model",
+            action="store",
+            default="openai/whisper-large-v3",
+            help="The model to use for transcription. Ex. distil-whisper/medium",
+        )
+        parser.add_argument(
+            "-d", "--device", action="store", default="auto", help="Set the torch device for the model. Ex. cuda:1"
+        )
+        parser.add_argument(
+            "-t",
+            "--dtype",
+            action="store",
+            default="auto",
+            help="Set the torch data type for processing (float16, int8)",
+        )
+        parser.add_argument("-P", "--port", action="store", default=8000, type=int, help="Server tcp port")
+        parser.add_argument("-H", "--host", action="store", default="localhost", help="Host to listen on, Ex. 0.0.0.0")
+        return parser.parse_args()
+
     args = parse_args(sys.argv[1:])
     state.model = args.model
     if args.device == "auto":

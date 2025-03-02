@@ -1,5 +1,4 @@
 import os
-import re
 import subprocess
 from pathlib import Path
 from time import sleep
@@ -26,8 +25,11 @@ class TestAPI:
         )
         self._sleep = 1
         self._timeout = 10
-        self._api_url = f'http://{os.environ.get("API_HOST")}:{os.environ.get("API_PORT")}'
+        self._api_host = os.environ.get("TRANSCRIBATION_API_HOST")
+        self._api_port = os.environ.get("TRANSCRIBATION_API_PORT")
+        self._api_url = f"http://{self._api_host}:{self._api_port}"
         self._file_dir = Path("tests/datasets")
+        self._model_name = "openai/whisper-small"
         self._model = OpenAI(
             base_url=f"{self._api_url}/v1",
             api_key="api_key",
@@ -46,8 +48,6 @@ class TestAPI:
                     raise Exception("Setup timeout")
 
     def teardown_class(self):
-        api_host = os.environ.get("API_HOST")
-        api_port = os.environ.get("API_PORT")
         subprocess.run(
             ["docker", "compose", "-f", self._compose_file, "down"],
             stdout=open(os.devnull, "w"),
@@ -57,7 +57,7 @@ class TestAPI:
         timeout_counter = 0
         while connection:
             response = subprocess.run(["docker", "ps", "--filter"], stdout=subprocess.PIPE)
-            response = str(response).find(f"{api_host}:{api_port}")
+            response = str(response).find(f"{self._api_host}:{self._api_port}")
             if response < 0:
                 connection = False
             else:
@@ -82,7 +82,7 @@ class TestAPI:
         assert isinstance(self._model, OpenAI)
         with open(file_path, "rb") as file:
             transcript = self._model.audio.transcriptions.create(
-                model="openai/whisper-small",
+                model=self._model_name,
                 file=file,
                 response_format="verbose_json",
                 timestamp_granularities="word",
