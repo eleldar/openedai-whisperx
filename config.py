@@ -23,7 +23,7 @@ class Config(BaseModel):
     language: str = Field("ru")
     prompt: str | None = Field(None)
     response_format: str = Field("verbose_json")
-    timestamp_granularities: str = "word"
+    timestamp_granularities: str = Field("word")
     tempfiles: Path = Path("/app/tempfiles")
     model_dir: Path = Path("/app/models")
 

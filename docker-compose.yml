@@ -1,7 +1,7 @@
 services:
   server:
     image: whisperx-server
-    container_name: WhisperXSever
+    container_name: WhisperXServer
     build:
       context: .
       dockerfile: Dockerfile
