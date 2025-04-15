@@ -39,7 +39,7 @@ async def transcriptions(
     except Exception as error:
         tempfile = None
         logger.error(error)
-        raise HTTPException(status_code=404, detail="Error save file")
+        raise HTTPException(status_code=404, detail=error)
 
     try:
         model = whisperx.load_model(
@@ -65,7 +65,7 @@ async def transcriptions(
         del model
     except Exception as error:
         logger.error(error)
-        raise HTTPException(status_code=404, detail="Error transcribation")
+        raise HTTPException(status_code=404, detail=error)
     finally:
         if tempfile and os.path.exists(tempfile):
             os.remove(tempfile)
@@ -100,6 +100,5 @@ async def transcriptions(
             headers={"Content-Disposition": f"attachment; filename={file.filename}_verbose.json"},
         )
     except Exception as error:
-        print(result)
         logger.error(error)
-        raise HTTPException(status_code=404, detail="Error create JSON")
+        raise HTTPException(status_code=404, detail=error)
