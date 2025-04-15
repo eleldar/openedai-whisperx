@@ -123,13 +123,13 @@ class TestAPI:
                 temperature=0,
             )
         assert isinstance(transcript, TranscriptionVerbose)
-        assert isinstance(transcript.duration, list)
+        assert isinstance(transcript.duration, float)
         assert isinstance(transcript.language, str)
         assert isinstance(transcript.text, str)
         assert isinstance(transcript.segments, list)
         assert isinstance(transcript.words, list)
         assert isinstance(transcript.word_segments, list)
-        assert transcript.duration == []
+        assert transcript.duration == 0.0
         assert transcript.language == "ru"
         assert transcript.text == ""
         assert transcript.segments == []

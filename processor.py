@@ -77,7 +77,7 @@ async def transcriptions(
 
     try:
         content = {
-            "duration": result["segments"][-1].get("end") if result.get("segments") else [],
+            "duration": result["segments"][-1].get("end") if result.get("segments") else 0.0,
             "language": language if language else state.language,
             "text": (
                 " ".join(
