@@ -3,4 +3,4 @@ uvicorn
 pydantic
 python-multipart
 torch
-whisperx
+whisperx==3.3.1

@@ -90,7 +90,7 @@ class TestAPI:
                 temperature=0,
             )
         assert isinstance(transcript, TranscriptionVerbose)
-        result = result = {
+        result = {
             "segments": list(map(dict, transcript.segments)),
             "word_segments": list(map(dict, transcript.word_segments)),
         }
@@ -108,3 +108,30 @@ class TestAPI:
             pred_text = str(transcript.model_dump_json())
             threshold = len(true_text) * self._distance_coef
             assert distance(pred_text, true_text) <= threshold
+
+    async def test_transcriptions_no_sound(self):
+        file_path = self._file_dir / "no_sound.mp4"
+        assert os.path.exists(file_path)
+        assert isinstance(self._model, OpenAI)
+        with open(file_path, "rb") as file:
+            transcript = self._model.audio.transcriptions.create(
+                model=self._model_name,
+                file=file,
+                response_format="verbose_json",
+                timestamp_granularities="word",
+                language="ru",
+                temperature=0,
+            )
+        assert isinstance(transcript, TranscriptionVerbose)
+        assert isinstance(transcript.duration, list)
+        assert isinstance(transcript.language, str)
+        assert isinstance(transcript.text, str)
+        assert isinstance(transcript.segments, list)
+        assert isinstance(transcript.words, list)
+        assert isinstance(transcript.word_segments, list)
+        assert transcript.duration == []
+        assert transcript.language == "ru"
+        assert transcript.text == ""
+        assert transcript.segments == []
+        assert transcript.words == []
+        assert transcript.word_segments == []

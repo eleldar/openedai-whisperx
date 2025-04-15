@@ -77,14 +77,22 @@ async def transcriptions(
 
     try:
         content = {
-            "duration": result["segments"][-1].get("end"),
+            "duration": result["segments"][-1].get("end") if result.get("segments") else [],
             "language": language if language else state.language,
-            "text": " ".join(
-                [segment.get("text", "").strip() for segment in result["segments"] if segment.get("text", "").strip()]
+            "text": (
+                " ".join(
+                    [
+                        segment.get("text", "").strip()
+                        for segment in result["segments"]
+                        if segment.get("text", "").strip()
+                    ]
+                )
+                if result.get("segments")
+                else ""
             ),
-            "segments": result["segments"],
-            "words": result["word_segments"],
-            "word_segments": result["word_segments"],
+            "segments": result["segments"] if result.get("segments") else [],
+            "words": result["word_segments"] if result.get("word_segments") else [],
+            "word_segments": result["word_segments"] if result.get("word_segments") else [],
         }
         return JSONResponse(
             content=content,
@@ -92,5 +100,6 @@ async def transcriptions(
             headers={"Content-Disposition": f"attachment; filename={file.filename}_verbose.json"},
         )
     except Exception as error:
+        print(result)
         logger.error(error)
         raise HTTPException(status_code=404, detail="Error create JSON")
